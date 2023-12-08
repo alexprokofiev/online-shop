@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  # nginx:
+    # balancer
+
+  app:
+    ports:
+      - "80:80"
+    build: .
+
+  db:
+    image: mysql:8.2.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  # dragonflydb:
+    # cache
