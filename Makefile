@@ -8,4 +8,4 @@ logs:
 	docker-compose logs -f
 
 build:
-	docker-compose build
+	docker build . -t app
