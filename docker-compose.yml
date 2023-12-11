@@ -5,6 +5,7 @@ services:
     image: nginx:stable-alpine3.17-slim
     volumes:
       - "./conf/online-shop.conf:/etc/nginx/nginx.conf"
+      - "./static:/static"
     ports:
       - "80:80"
 
