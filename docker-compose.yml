@@ -1,12 +1,14 @@
 version: "3.8"
 
 services:
-  # nginx:
-    # balancer
-
-  app:
+  web-server:
+    image: nginx:stable-alpine3.17-slim
+    volumes:
+      - "./conf/online-shop.conf:/etc/nginx/nginx.conf"
     ports:
       - "80:80"
+
+  app:
     image: app
     volumes:
       - "./:/app"
