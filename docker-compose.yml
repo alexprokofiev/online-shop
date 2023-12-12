@@ -19,6 +19,8 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
 
-  # dragonflydb:
-    # cache
+  dragonflydb:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
