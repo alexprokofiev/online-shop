@@ -10,6 +10,7 @@ app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'shop'
 app.config['MYSQL_HOST'] = 'db'
 
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 db.init_app(app)
 
 @app.route("/")
@@ -33,5 +34,9 @@ def cart():
     return render_template("cart.html")
 
 @app.route("/connect")
-def cart():
+def connect():
     return render_template("connect.html")
+
+@app.route("/main")
+def main():
+    return render_template("main.html")

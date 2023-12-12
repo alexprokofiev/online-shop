@@ -4,6 +4,11 @@ const router = async route => {
 
     let url = route.slice(1);
 
+    if (url === "") {
+        content.innerHTML = await (await fetch("/home")).text();
+        return;
+    }
+
     if (url === "/") {
         url = "/home";
     }
