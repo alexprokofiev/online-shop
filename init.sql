@@ -10,3 +10,8 @@ CREATE TABLE `users` (
     PRIMARY KEY (`id`),
     UNIQUE KEY (`email`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+INSERT INTO
+    `users` (email, phone_number, password)
+VALUES
+    ("qwe@qwe.qwe", "+79111111111", "qwe");

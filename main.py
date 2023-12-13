@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, abort, make_response
 from flask_mysqldb import MySQL
-from auth import auth_req, authenticate
+from auth import auth_req, authenticate, reg
 
 app = Flask(__name__)
 
@@ -18,10 +18,10 @@ db = MySQL(app)
 app.config["db"] = db
 
 
-@app.route("/test")
-@auth_req(app)
-def test():
-    return "123"
+# @app.route("/test")
+# @auth_req(app)
+# def test():
+#     pass
 
 
 @app.route("/")
@@ -41,8 +41,31 @@ def catalog():
 
 @app.route("/login", methods=["GET"])
 def login_get():
-    return render_template("login.html")
+    return render_template("login.html", signin=True)
 
+
+@app.route("/signup", methods=["GET"])
+def signup_get():
+    return render_template("login.html", signin=False)
+
+
+@app.route("/signup", methods=["POST"])
+def signup_post():
+    email = request.form.get("email")
+    password = request.form.get("password")
+    phone_number = request.form.get("phone_number")
+
+    if email is None or password is None:
+        abort(400)
+
+    token = reg(app, email, password, phone_number)
+    if token is None:
+        abort(403)
+
+    response = make_response(render_template("index.html"))
+    response.set_cookie("token", token)
+
+    return response
 
 @app.route("/login", methods=["POST"])
 def login_post():
@@ -75,11 +98,3 @@ def connect():
 @app.route("/main")
 def main():
     return render_template("main.html")
-
-
-# class User(object):
-#     def __init__(self, id, email, phone_number, password):
-#         self.id = id
-#         self.email = email
-#         self.phone_number = phone_number
-#         self.password = password

@@ -2,10 +2,11 @@ const router = async route => {
     let content = document.getElementById("root");
     content.innerHTML = "";
 
-    let url = route.slice(1);
+    let url = route.startsWith("#") ? route.slice(1) : route;
 
     if (url === "") {
         content.innerHTML = await (await fetch("/home")).text();
+
         return;
     }
 

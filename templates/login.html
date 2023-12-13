@@ -5,10 +5,12 @@
             <label class="form-label" for="email">Email address</label>
         </div>
 
-        <div class="form-outline mb-4 input-group-lg">
-            <input type="tel" name="phone" class="form-control" required />
-            <label class="form-label" for="phone">Phone number</label>
-        </div>
+        {% if not signin %}
+            <div class="form-outline mb-4 input-group-lg">
+                <input type="tel" name="phone" class="form-control" required />
+                <label class="form-label" for="phone_number">Phone number</label>
+            </div>
+        {% endif %}
 
         <div class="form-outline mb-4 input-group-lg">
             <input type="password" name="password" class="form-control" required />
@@ -25,7 +27,14 @@
         </div>
 
         <div class="form-outline">
-            <button type="submit" class="btn btn-primary btn-block w-100">Sign in</button>
+            <button type="submit" class="btn btn-primary btn-block w-100">
+                Sign
+                {% if signin %}
+                    in
+                {% else %}
+                    up
+                {% endif %}
+            </button>
         </div>
     </form>
 </div>

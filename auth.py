@@ -46,6 +46,37 @@ def authenticate(app, email: str, password: str) -> str | None:
     return token
 
 
+# sql-injection))))))))))))))))))))))))))
+def reg(app, email: str, password: str, phone_number: str) -> str | None:
+    cursor = app.config["db"].connection.cursor()
+    cursor.execute(
+        f"""
+            INSERT INTO
+                shop.users
+            (
+                email,
+                phone_number,
+                password
+            )
+            VALUES (
+                { email },
+                { phone_number },
+                { password }
+            );
+        """
+    )
+
+    user = cursor.fetchone()
+    if user is None:
+        return None
+
+    token = jwt.encode(
+        {"user_id": user[0]}, app.config["SECRET_KEY"], algorithm="HS256"
+    )
+
+    return token
+
+
 def identity(app, token: str) -> bool:
     try:
         payload = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
