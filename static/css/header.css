@@ -2,13 +2,15 @@
     padding-left: calc((100vw - 1140px) / 2 + 15px) !important;
     padding-right: calc((100vw - 1140px) / 2 + 15px) !important;
     font-family: "Montserrat", sans-serif !important;
+    font-family: "Lisu Bosa" !important;
+    font-size: 20px;
 }
 
-/* label > #search-input {
-    height: 0;
-    width: 0;
-    display: none;
-} */
+.navbar-brand {
+    font-size: 30px !important;
+    padding-bottom: 1px !important;
+    padding-top: 0px !important;
+}
 
 #search-input {
     border: none;
@@ -18,11 +20,11 @@
     background-position: center;
     background-size: 16px 16px;
     -webkit-transition:
-        width 1000ms ease,
-        background 1000ms ease;
+        width 400ms ease,
+        background 400ms ease;
     transition:
-        width 1000ms ease,
-        background 1000ms ease;
+        width 400ms ease,
+        background 400ms ease;
     cursor: pointer;
     height: 0px;
     position: relative;
