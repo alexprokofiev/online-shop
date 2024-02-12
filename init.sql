@@ -4,16 +4,16 @@ USE `shop`;
 
 CREATE TABLE `users` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `email` varchar(128) NOT NULL,
-    `phone_number` varchar(128) NOT NULL,
-    `password` varchar(128) NOT NULL COMMENT 'в сыром виде храним пароли...',
+    `email` char(128) NOT NULL,
+    `phone_number` char(128) NOT NULL,
+    `password` char(128) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY (`email`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 CREATE TABLE `products` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `name` varchar(128) NOT NULL,
+    `name` char(128) NOT NULL,
     `desc` varchar(128) NOT NULL,
     `category_id` bigint(20) NOT NULL,
     `cost` float NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `products` (
 CREATE TABLE `images` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `product_id` bigint(20) NOT NULL,
-    `path` varchar(128) NOT NULL,
+    `path` char(128) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY (`path`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
@@ -32,7 +32,11 @@ CREATE TABLE `images` (
 INSERT INTO
     `users` (`email`, `phone_number`, `password`)
 VALUES
-    ("qwe@qwe.qwe", "+79111111111", "qwe");
+    (
+        "qwe@qwe.qwe",
+        "+79111111111",
+        "b5ba77af1f7bda735894e746a199acb1d2c836424da2fc46bebb55423dccbff871877a30fab77a31e47b0a29ea0154882e532e9a29b220a8f2958773313bbb2a"
+    );
 
 INSERT INTO
     `products` (

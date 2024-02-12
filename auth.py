@@ -1,6 +1,7 @@
 import jwt
 from functools import wraps
 from flask import request, abort
+import hashlib
 
 
 def auth_req(app):
@@ -19,19 +20,19 @@ def auth_req(app):
     return _auth_req
 
 
-# keeping raw users passwords =(
 def authenticate(app, email: str, password: str) -> str | None:
     cursor = app.config["db"].connection.cursor()
     cursor.execute(
         f"""
             SELECT
-                id,
-                password
+                id
             FROM
                 shop.users
             WHERE
                 email = '{email}'
-                AND password = '{password}';
+                AND password = '{ hashlib.sha512(
+                    app.config["SECRET_KEY"] + password.encode("utf-8")
+                ).hexdigest() }';
         """
     )
 
@@ -46,7 +47,6 @@ def authenticate(app, email: str, password: str) -> str | None:
     return token
 
 
-# sql-injection))))))))))))))))))))))))))
 def reg(app, email: str, password: str, phone_number: str) -> str | None:
     cursor = app.config["db"].connection.cursor()
     cursor.execute(
@@ -61,7 +61,7 @@ def reg(app, email: str, password: str, phone_number: str) -> str | None:
             VALUES (
                 { email },
                 { phone_number },
-                { password }
+                { hashlib.sha512(app.config["SECRET_KEY"] + password.encode("utf-8")).hexdigest() }
             );
         """
     )

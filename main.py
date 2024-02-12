@@ -18,12 +18,6 @@ db = MySQL(app)
 app.config["db"] = db
 
 
-# @app.route("/test")
-# @auth_req(app)
-# def test():
-#     pass
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
