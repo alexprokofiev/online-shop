@@ -9,3 +9,6 @@ logs:
 
 build:
 	docker build . -t app
+
+build-rs:
+	docker build . -t app --file Dockerfile-rs

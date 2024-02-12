@@ -1,0 +1,14 @@
+FROM python:3.11.7-slim
+
+# todo merge runs
+RUN pip3 install --upgrade pip
+
+RUN pip3 install robyn jinja2
+
+WORKDIR /app
+
+COPY . /app
+
+EXPOSE 80
+
+ENTRYPOINT [ "python3", "/app/main_rs.py", "--processes", "4", "--workers", "4"]
