@@ -31,7 +31,7 @@ def authenticate(app, email: str, password: str) -> str | None:
             WHERE
                 email = '{email}'
                 AND password = '{ hashlib.sha512(
-                    app.config["SECRET_KEY"] + password.encode("utf-8")
+                    app.config["SECRET_KEY"].encode("utf-8") + password.encode("utf-8")
                 ).hexdigest() }';
         """
     )
@@ -61,7 +61,9 @@ def reg(app, email: str, password: str, phone_number: str) -> str | None:
             VALUES (
                 { email },
                 { phone_number },
-                { hashlib.sha512(app.config["SECRET_KEY"] + password.encode("utf-8")).hexdigest() }
+                { hashlib.sha512(
+                    app.config["SECRET_KEY"].encode("utf-8") + password.encode("utf-8")
+                ).hexdigest() }
             );
         """
     )
