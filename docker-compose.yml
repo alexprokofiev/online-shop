@@ -8,11 +8,19 @@ services:
       - "./static:/static"
     ports:
       - "80:80"
+    deploy:
+      resources:
+        limits:
+          memory: '32MB'
 
   app:
     image: app
     volumes:
       - "./:/app"
+    deploy:
+      resources:
+        limits:
+          memory: '128MB'
 
   db:
     image: mysql:8.2.0
@@ -20,7 +28,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
+      - "./conf/my.cnf:/etc/my.cnf"
       - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+    deploy:
+      resources:
+        limits:
+          memory: '256MB'
 
-  dragonflydb:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly
+  # dragonflydb:
+  #   image: docker.dragonflydb.io/dragonflydb/dragonfly
