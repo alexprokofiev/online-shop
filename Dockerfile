@@ -1,13 +1,21 @@
-FROM python:3.11.7-slim
+FROM rust:1.76.0-alpine3.19 AS builder
 
-RUN apt update && apt install pkg-config build-essential libmariadb-dev -y
+RUN apk add musl-dev && \
+    wget https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-amd64_linux.tar.xz && \
+    tar xf upx-4.2.2-amd64_linux.tar.xz
 
-RUN pip3 install --upgrade pip && pip3 install -U Flask flask-mysqldb uwsgi pyjwt
+COPY ./ /app
 
 WORKDIR /app
 
-COPY . /app
+RUN cargo build --release && \
+    /upx-4.2.2-amd64_linux/upx --best --lzma /app/target/release/online-shop
+
+
+FROM scratch
+
+COPY --from=builder /app/target/release/online-shop /app
 
 EXPOSE 80
 
-ENTRYPOINT [ "uwsgi", "--ini", "uwsgi.ini" ]
+CMD ["/app"]
