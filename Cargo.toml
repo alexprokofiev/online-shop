@@ -6,15 +6,20 @@ edition = "2021"
 [dependencies]
 actix-web = "4"
 actix-files = "0.6.5"
+tera = { version = "1", default-features = false }
+lazy_static = "1.4.0"
+serde = "1.0.197"
+jsonwebtoken = "9.2.0"
+sqlx = { version = "0.7.4", features = ["runtime-async-std-native-tls", "mysql"] }
 
 
 # see https://github.com/johnthagen/min-sized-rust
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
-opt-level = "z"  # Optimize for size.
+opt-level = 3  # Optimize for size.
 lto = true
 codegen-units = 1
 panic = "abort"
 
 [build]
-rustflags = ["-Z", "threads=16"]
+rustflags = ["-Z", "threads=16", "-Z", "location-detail", "none"]

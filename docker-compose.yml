@@ -14,15 +14,15 @@ services:
           memory: '32MB'
 
   app:
-    image: app
-    volumes:
-      - "./:/app"
+    image: ${IMG}
+    environment:
+      DATABASE_URL: mysql://root:root@mysql:3306/shop
     deploy:
       resources:
         limits:
           memory: '128MB'
 
-  db:
+  mysql:
     image: mysql:8.2.0
     command: --default-authentication-plugin=mysql_native_password
     environment:
@@ -34,6 +34,3 @@ services:
       resources:
         limits:
           memory: '256MB'
-
-  # dragonflydb:
-  #   image: docker.dragonflydb.io/dragonflydb/dragonfly

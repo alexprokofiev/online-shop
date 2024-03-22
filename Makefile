@@ -1,5 +1,5 @@
 up:
-	docker-compose up -d --build
+	IMG=app docker-compose -f docker-compose.yml up -d
 
 down:
 	docker-compose down
@@ -7,11 +7,11 @@ down:
 logs:
 	docker-compose logs -f
 
-dockerfile=Dockerfile
-
-ifeq ($(MODE),dev)
-	dockerfile:=$(dockerfile)-dev
-endif
-
 build:
-	docker build . -t app --file=$(dockerfile)
+	docker build . -t app
+
+build_dev:
+	docker build . -t app-dev --file=Dockerfile-dev
+
+dev:
+	IMG=app-dev docker-compose -f docker-compose-dev.yml up -d

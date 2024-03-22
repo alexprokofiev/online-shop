@@ -1,69 +1,148 @@
-use actix_files::NamedFile;
-use std::path::PathBuf;
 use std::alloc::System;
-use actix_web::{Result, HttpRequest, get};
-use std::thread::available_parallelism;
+use actix_web::{get, post, web, cookie, HttpResponse};
+use tera::{Tera, Context};
+use lazy_static::lazy_static;
+
+use serde::{Serialize, Deserialize};
+use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+
+use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
+
+mod model;
+pub use crate::model::User;
+
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    sub: String,
+    company: String,
+    exp: usize,
+}
+
+pub struct AppState {
+    db: MySqlPool,
+}
+
+lazy_static! {
+    pub static ref TEMPLATES: Tera = {
+        let mut tera = match Tera::new("templates/*") {
+            Ok(t) => t,
+            Err(e) => {
+                println!("Parsing error(s): {}", e);
+                ::std::process::exit(1);
+            }
+        };
+        tera.autoescape_on(vec![".html"]);
+        tera
+    };
+}
 
 #[global_allocator]
 static A: System = System;
 
 #[get("/home")]
-async fn home() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/home.html")?)
+async fn home() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("home.html", &Context::new()).unwrap()
+    )
 }
 
 #[get("/")]
-async fn index() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/index.html")?)
+async fn index() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("index.html", &Context::new()).unwrap()
+    )
 }
 
 #[get("/catalog")]
-async fn catalog() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/catalog.html")?)
+async fn catalog() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("catalog.html", &Context::new()).unwrap()
+    )
 }
 
 #[get("/login")]
-async fn get_login() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/login.html")?)
+async fn get_login() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("login.html", &Context::new()).unwrap()
+    )
+}
+
+#[post("/login")]
+async fn post_login(data: web::Data<AppState>) -> HttpResponse {
+    let users: Vec<User> = sqlx::query_as!(
+        User,
+        r#"SELECT * FROM users WHERE email = ? AND password = ?"#,
+        "JGnX2@example.com",
+        "123456"
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap();
+
+    if users.len() != 1 {
+        return HttpResponse::BadRequest().body("Login failed");
+    }
+
+    let claims = &Claims{
+        sub: "".to_string(),
+        company: "".to_string(),
+        exp: 0,
+    };
+
+    let token: String = encode(&Header::default(), &claims, &EncodingKey::from_secret(b"secret")).unwrap();
+
+    HttpResponse::Ok()
+        .cookie(cookie::Cookie::build("token", token).finish())
+        .body(
+            TEMPLATES.render("index.html", &Context::new()).unwrap()
+        )
 }
 
 #[get("/cart")]
-async fn cart() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/cart.html")?)
+async fn cart() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("catalog.html", &Context::new()).unwrap()
+    )
 }
 
 #[get("/connect")]
-async fn connect() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/connect.html")?)
-}
-
-#[get("/main")]
-async fn main_handler() -> Result<NamedFile> {
-    Ok(NamedFile::open("templates/main.html")?)
-}
-
-async fn static_files(req: HttpRequest) -> Result<NamedFile> {
-    let mut path: PathBuf = PathBuf::new();
-    path.push("static");
-    path.push(req.match_info().query("filename").parse::<String>().unwrap());
-
-    Ok(NamedFile::open(path)?)
+async fn connect() -> HttpResponse {
+    HttpResponse::Ok().body(
+        TEMPLATES.render("connect.html", &Context::new()).unwrap()
+    )
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    use actix_web::{App, web, HttpServer};
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let pool = match MySqlPoolOptions::new()
+        .max_connections(10)
+        .connect(&database_url)
+        .await
+    {
+        Ok(pool) => {
+            println!("Connection to the database is successful!");
+            pool
+        }
+        Err(err) => {
+            println!("Failed to connect to the database: {:?}", err);
+            std::process::exit(1);
+        }
+    };
 
-    HttpServer::new(|| {
+    use actix_web::{App, HttpServer};
+    use std::thread::available_parallelism;
+
+    HttpServer::new(move || {
         App::new()
-            .route("/static/{filename:.*}", web::get().to(static_files))
+            .app_data(web::Data::new(AppState { db: pool.clone() }))
             .service(home)
             .service(index)
             .service(catalog)
             .service(get_login)
             .service(cart)
             .service(connect)
-            .service(main_handler)
     }).workers(available_parallelism().unwrap().get())
         .bind(("0.0.0.0", 8080))?
         .run()
