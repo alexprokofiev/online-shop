@@ -1553,6 +1553,7 @@ dependencies = [
  "jsonwebtoken",
  "lazy_static",
  "serde",
+ "sha2",
  "sqlx",
  "tera",
 ]
