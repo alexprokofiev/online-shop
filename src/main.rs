@@ -4,7 +4,8 @@ use tera::{Tera, Context};
 use lazy_static::lazy_static;
 
 use serde::{Serialize, Deserialize};
-use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use jsonwebtoken;
+use sha2::{Sha512, Digest};
 
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
@@ -14,14 +15,15 @@ pub use crate::model::User;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
-    sub: String,
-    company: String,
-    exp: usize,
+    user_id: i64,
 }
 
 pub struct AppState {
     db: MySqlPool,
 }
+
+const SECRET_KEY: &str = "SOME SECRET KEY";
+const PASSWORD_HASH_SALT: &str = "polina loh";
 
 lazy_static! {
     pub static ref TEMPLATES: Tera = {
@@ -63,18 +65,32 @@ async fn catalog() -> HttpResponse {
 
 #[get("/login")]
 async fn get_login() -> HttpResponse {
+    let mut ctx = Context::new();
+
+    ctx.insert("signin", &true);
+
     HttpResponse::Ok().body(
-        TEMPLATES.render("login.html", &Context::new()).unwrap()
+        TEMPLATES.render("login.html", &ctx).unwrap()
     )
 }
 
+#[derive(Deserialize)]
+struct LoginForm {
+    email: String,
+    password: String,
+}
+
 #[post("/login")]
-async fn post_login(data: web::Data<AppState>) -> HttpResponse {
+async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> HttpResponse {
+    let mut hasher = Sha512::new();
+    hasher.update(PASSWORD_HASH_SALT);
+    hasher.update(form.password.clone());
+
     let users: Vec<User> = sqlx::query_as!(
         User,
         r#"SELECT * FROM users WHERE email = ? AND password = ?"#,
-        "JGnX2@example.com",
-        "123456"
+        form.email,
+        format!("{:x}", hasher.finalize())
     )
     .fetch_all(&data.db)
     .await
@@ -85,12 +101,14 @@ async fn post_login(data: web::Data<AppState>) -> HttpResponse {
     }
 
     let claims = &Claims{
-        sub: "".to_string(),
-        company: "".to_string(),
-        exp: 0,
+        user_id: users[0].id,
     };
 
-    let token: String = encode(&Header::default(), &claims, &EncodingKey::from_secret(b"secret")).unwrap();
+    let token: String = jsonwebtoken::encode(
+        &jsonwebtoken::Header::default(),
+        &claims,
+        &jsonwebtoken::EncodingKey::from_secret(SECRET_KEY.as_bytes()),
+    ).unwrap();
 
     HttpResponse::Ok()
         .cookie(cookie::Cookie::build("token", token).finish())
@@ -141,6 +159,7 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(catalog)
             .service(get_login)
+            .service(post_login)
             .service(cart)
             .service(connect)
     }).workers(available_parallelism().unwrap().get())
