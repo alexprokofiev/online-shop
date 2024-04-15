@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  web-server:
+    image: nginx:stable-alpine3.17-slim
+    volumes:
+      - "./conf/online-shop.conf:/etc/nginx/nginx.conf"
+      - "./static:/static"
+    ports:
+      - "80:80"
+    deploy:
+      resources:
+        limits:
+          memory: '32MB'
+
+  app:
+    image: ${IMG}
+    volumes:
+      - "./:/app"
+      - "/usr/local/cargo/registry:/usr/local/cargo/registry"
+    environment:
+      DATABASE_URL: mysql://root:root@mysql:3306/shop
+
+  mysql:
+    image: mysql:8.2.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "./conf/my.cnf:/etc/my.cnf"
+      - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+    deploy:
+      resources:
+        limits:
+          memory: '256MB'

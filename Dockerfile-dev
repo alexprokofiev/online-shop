@@ -1,31 +1,9 @@
-FROM rust:1.76.0-alpine3.19
+FROM rust:1.77.0-alpine
 
-RUN apk add musl-dev
-
-RUN cargo init --name online-shop /app
-
-COPY Cargo.toml Cargo.lock /app/
-
-COPY Cargo.toml /app/
+RUN apk add musl-dev pkgconfig libressl-dev && cargo install cargo-watch
 
 COPY ./ /app
 
 WORKDIR /app
 
-# A bit of magic here!
-# * We're mounting that cache again to use during the build, otherwise it's not present and we'll have to download those again - bad!
-# * EOF syntax is neat but not without its drawbacks. We need to `set -e`, otherwise a failing command is going to continue on
-# * Rust here is a bit fiddly, so we'll touch the files (even though we copied over them) to force a new build
-RUN --mount=type=cache,target=/usr/local/cargo/registry <<EOF
-  set -e
-  # update timestamps to force a new build
-  touch /app/src/main.rs
-  cargo build
-EOF
-
-
-RUN --mount=type=cache,target=/usr/local/cargo/registry cargo build
-
-EXPOSE 80
-
-CMD ["/app/target/debug/online-shop"]
+CMD cargo watch -w templates -w src -x run
