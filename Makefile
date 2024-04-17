@@ -2,7 +2,7 @@ up:
 	IMG=app docker-compose -f docker-compose.yml up -d
 
 down:
-	docker-compose down
+	IMG=app docker-compose -f docker-compose.yml down 
 
 logs:
 	docker-compose logs -f
@@ -15,3 +15,6 @@ build_dev:
 
 dev:
 	IMG=app-dev docker-compose -f docker-compose-dev.yml up -d
+
+pivko:
+	принеси мне пива
