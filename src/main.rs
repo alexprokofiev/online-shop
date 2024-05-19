@@ -120,7 +120,7 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
 #[get("/cart")]
 async fn cart() -> HttpResponse {
     HttpResponse::Ok().body(
-        TEMPLATES.render("catalog.html", &Context::new()).unwrap()
+        TEMPLATES.render("cart.html", &Context::new()).unwrap()
     )
 }
 
