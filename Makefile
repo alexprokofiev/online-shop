@@ -15,6 +15,3 @@ build_dev:
 
 dev:
 	IMG=app-dev docker-compose -f docker-compose-dev.yml up -d
-
-pivko:
-	принеси мне пива
