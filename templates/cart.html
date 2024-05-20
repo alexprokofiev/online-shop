@@ -1,1 +1,37 @@
-<p>Я КОРЗИНА</p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Корзина Товаров</title>
+<link rel="stylesheet" href="basket.css">
+</head>
+<body>
+<div id="shopping-cart" class="centered-frame">
+    <h2>Корзина</h2>
+    <div class="cart-item">
+        <div class="product-info">
+            <img src="https://files.gifts.ru/reviewer/tb/92/14101.30_46_500.jpg" alt="Товар">
+            <h3>Название товара</h3>
+            <p>Цена: 100 ₽</p>
+            <p>Размер: S</p>
+        </div>
+        <div class="actions">
+            <button class="increase">+</button>
+            <span class="quantity">1</span>
+            <button class="decrease">-</button>
+            <button class="remove">Удалить</button>
+        </div>
+    </div>
+    <button id="clear-cart">Очистить Корзину</button>
+    <div id="shopping-cart" class="centered-frame">
+        <h2>Корзина</h2>
+        <!-- Содержимое корзины -->
+        <div id="summary">
+            <p>Общее количество товаров: <span id="totalItemsCount">0</span></p>
+            <p>Общая сумма заказа: <span id="totalOrderSum">0 ₽</span></p>
+        </div>
+    </div>
+</div>
+<script src="basket.js"></script>
+</body>
+</html>
