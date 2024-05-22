@@ -8,18 +8,19 @@ services:
       - "./static:/static"
     ports:
       - "80:80"
-    deploy:
-      resources:
-        limits:
-          memory: '32MB'
+    depends_on:
+      - app
 
   app:
     image: ${IMG}
+    hostname: app
     volumes:
       - "./:/app"
-      - "/usr/local/cargo/registry:/usr/local/cargo/registry"
+      - "./cargo_cache:/usr/local/cargo/registry"
     environment:
       DATABASE_URL: mysql://root:root@mysql:3306/shop
+    depends_on:
+      - mysql
 
   mysql:
     image: mysql:8.2.0
@@ -29,7 +30,3 @@ services:
     volumes:
       - "./conf/my.cnf:/etc/my.cnf"
       - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
-    deploy:
-      resources:
-        limits:
-          memory: '256MB'
