@@ -1,6 +1,7 @@
 .shopping-cart {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   max-width: 600px;
   margin: 40px auto;
   padding: 20px;
@@ -11,7 +12,6 @@
 
 .item {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid rgb(95, 95, 95);
   padding: 10px;
@@ -19,14 +19,17 @@
 
 .image {
   flex-grow: 1;
-  max-width: 190px;
+  max-width: 220px;
   align-self: flex-start;
+  margin-bottom: 0;
 }
 
 .details {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-left: 50px;
+  width: max-content;
 }
 
 .details h3 {
@@ -36,7 +39,16 @@
   color: #333;
 }
 
+.details h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  width: 400px;
+}
+
 .details p {
+  margin: 0;
   font-size: 16px;
   color: rgb(0, 0, 0);
 }
@@ -101,4 +113,55 @@
 .decrease-qty:hover,
 .increase-qty:hover {
   opacity: 0.8;
+}
+
+.total-items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid rgb(95, 95, 95);
+}
+
+.total-items.items-count {
+  font-size: 18px;
+  color: #333;
+}
+
+.total-cost {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.total-cost.cost-label {
+  font-size: 18px;
+  color: #333;
+}
+
+.total-cost.cost-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #007BFF;
+}
+
+.clear-cart-btn {
+  order: 1;
+  margin-top: 10px;
+  background-color: #ff5e52;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid rgb(95, 95, 95);
+}
+
+.clear-cart-btn:hover {
+  background-color: #d32f2f;
 }
