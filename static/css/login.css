@@ -1,0 +1,72 @@
+.container {
+  width: 90%;
+  max-width: 500px;
+  margin: auto; /* Центрирование контейнера */
+}
+
+/* Стили для формы */
+form {
+  background-color: rgb(56, 56, 56); /* Серый фон формы */
+  padding: 20px; /* Отступы внутри формы */
+  border-radius: 10px; /* Скругленные углы формы */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Тень под формой */
+}
+
+.form-outline {
+  position: relative; /* Для позиционирования метки относительно поля ввода */
+  margin-bottom: 15px; /* Отступ снизу для каждого блока ввода */
+}
+
+.form-control {
+  border: 1px solid #1f1f1f; /* Граница поля ввода */
+  border-radius: 5px; /* Скругленные углы поля ввода */
+  padding: 10px; /* Отступы внутри поля ввода */
+  width: 100%; /* Ширина поля ввода */
+  color: #fff; /* Белый цвет текста */
+  background-color: #333; /* Серый фон поля ввода */
+}
+
+.form-control::placeholder {
+  color: #ccc; /* Серый цвет текста-заполнителя */
+  opacity: 1; /* Полностью видимый текст-заполнитель */
+}
+
+.form-control:focus {
+  outline: none; /* Удаление стандартного аутлайна */
+  border-color: #640a0a; /* Цвет границы при фокусе */
+}
+
+.form-control:focus::placeholder {
+  color: #007bff; /* Цвет текста-заполнителя при фокусе */
+}
+
+.form-label {
+  position: absolute; /* Позиционирование метки над полем ввода */
+  top: 0;
+  left: 10px;
+  pointer-events: none; /* Метка не будет реагировать на клик */
+  transition: all 0.3s ease; /* Анимация перехода при фокусе */
+  font-size: 16px; /* Увеличение размера шрифта метки */
+}
+
+.form-control:focus +.form-label,
+.form-control:not(:placeholder-shown) +.form-label {
+  font-size: 16px; /* Увеличение размера шрифта метки при фокусе или заполнении */
+  top: -18px; /* Перемещение метки вверх */
+  color: #720c0c; /* Изменение цвета метки при фокусе или заполнении */
+}
+
+.btn-primary {
+  background-color: #680808; /* Цвет кнопки */
+  color: #fff; /* Белый цвет текста кнопки */
+  border: none; /* Удаление границы кнопки */
+  padding: 10px 20px; /* Отступы внутри кнопки */
+  cursor: pointer; /* Изменение курсора на указатель при наведении */
+  border-radius: 5px; /* Скругленные углы кнопки */
+  width: 100%; /* Ширина кнопки */
+  transition: background-color 0.3s ease; /* Анимация изменения цвета фона */
+}
+
+.btn-primary:hover {
+  background-color: #4e0404; /* Темнее оттенок кнопки при наведении */
+}
