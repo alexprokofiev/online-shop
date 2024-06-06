@@ -124,13 +124,6 @@ async fn cart() -> HttpResponse {
     )
 }
 
-#[get("/connect")]
-async fn connect() -> HttpResponse {
-    HttpResponse::Ok().body(
-        TEMPLATES.render("connect.html", &Context::new()).unwrap()
-    )
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -161,7 +154,6 @@ async fn main() -> std::io::Result<()> {
             .service(get_login)
             .service(post_login)
             .service(cart)
-            .service(connect)
     }).workers(available_parallelism().unwrap().get())
         .bind(("0.0.0.0", 8080))?
         .run()
