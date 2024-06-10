@@ -5,7 +5,7 @@ down:
 	IMG=app docker-compose -f docker-compose.yml down 
 
 logs:
-	docker-compose logs -f
+	IMG=app docker-compose logs -f
 
 build:
 	docker build . -t app
