@@ -49,7 +49,7 @@
    transition: 0.3s ease-in;
 }
 
-.product-item:hover .button {
+.product-item:hover.button {
    background: #700404;
 }
 
@@ -70,15 +70,16 @@
 }
 
 @media screen and (max-width: 767px) {
-   .product-item {
+  .product-item {
       width: calc(50% - 20px);
       margin-right: 10px;
    }
 
-   .product-item:last-child {
+  .product-item:last-child {
       margin-right: 0;
    }
 }
+
 .custom-select-wrapper {
    position: relative;
    display: inline-block;
@@ -86,37 +87,36 @@
 
 .search-input {
    text-align: right;
-   width: 200px; /* Ширина поля ввода */
-   padding: 10px 20px; /* Отступы внутри поля */
-   border: 2px solid #333; /* Серая граница */
-   border-radius: 5px; /* Скругленные углы */
-   background-color: #ddd; /* Фон поля */
-   color: #333; /* Цвет текста */
-   font-size: 14px; /* Размер шрифта */
-   transition: border-color 0.3s ease, background-color 0.3s ease; /* Анимация изменения стилей */
+   width: 200px;
+   padding: 10px 20px;
+   border: 2px solid #333;
+   border-radius: 5px;
+   background-color: #ddd;
+   color: #333;
+   font-size: 14px;
+   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .search-input:focus {
-   border-color: #640000; /* Бордовый цвет границы при фокусе */
-   background-color: #ccc; /* Светло-серый фон при фокусе */
+   border-color: #640000;
+   background-color: #ccc;
 }
 
-/* Дополнительные стили для кнопки поиска (если она нужна) */
 .custom-select-wrapper.search-btn {
    position: absolute;
    right: 10px;
    top: 50%;
    transform: translateY(-50%);
-   background-color: #640000; /* Бордовый фон кнопки */
-   color: #fff; /* Белый текст */
+   background-color: #640000;
+   color: #fff;
    border: none;
-   border-radius: 50%; /* Полукруглые углы */
+   border-radius: 50%;
    width: 30px;
    height: 30px;
    cursor: pointer;
-   transition: background-color 0.3s ease; /* Анимация изменения фона */
+   transition: background-color 0.3s ease;
 }
 
 .custom-select-wrapper.search-btn:hover {
-   background-color: #4d0000; /* Темнеший бордовый фон при наведении */
+   background-color: #4d0000;
 }
