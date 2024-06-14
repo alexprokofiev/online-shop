@@ -8,6 +8,8 @@ services:
       - "./static:/static"
     ports:
       - "80:80"
+    depends_on:
+      - app
     deploy:
       resources:
         limits:
@@ -17,10 +19,12 @@ services:
     image: ${IMG}
     environment:
       DATABASE_URL: mysql://root:root@mysql:3306/shop
+    depends_on:
+      - mysql
     deploy:
       resources:
         limits:
-          memory: '128MB'
+          memory: '32MB'
 
   mysql:
     image: mysql:8.2.0
@@ -33,4 +37,4 @@ services:
     deploy:
       resources:
         limits:
-          memory: '256MB'
+          memory: '128MB'

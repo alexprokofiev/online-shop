@@ -9,10 +9,6 @@
    display: inline-block;
 }
 
-.product-item:hover {
-   border-bottom: 2px solid #700404;
-}
-
 .product-item img {
    display: block;
    width: 100%;
@@ -49,7 +45,7 @@
    transition: 0.3s ease-in;
 }
 
-.product-item:hover.button {
+.button:hover {
    background: #700404;
 }
 

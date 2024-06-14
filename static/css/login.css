@@ -21,9 +21,11 @@ form {
   border: 1px solid #1f1f1f; /* Граница поля ввода */
   border-radius: 5px; /* Скругленные углы поля ввода */
   padding: 10px; /* Отступы внутри поля ввода */
-  width: 100%; /* Ширина поля ввода */
+  width: 95%; /* Ширина поля ввода */
   color: #fff; /* Белый цвет текста */
   background-color: #333; /* Серый фон поля ввода */
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .form-control::placeholder {
@@ -54,6 +56,7 @@ form {
   font-size: 16px; /* Увеличение размера шрифта метки при фокусе или заполнении */
   top: -18px; /* Перемещение метки вверх */
   color: #720c0c; /* Изменение цвета метки при фокусе или заполнении */
+  margin-bottom: 10px;
 }
 
 .btn-primary {

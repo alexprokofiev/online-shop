@@ -1,4 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `shop`;
+CREATE DATABASE IF NOT EXISTS `shop` CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+SET NAMES utf8;
 
 USE `shop`;
 
@@ -13,20 +15,32 @@ CREATE TABLE `users` (
 
 CREATE TABLE `products` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `name` char(128) NOT NULL,
-    `desc` varchar(128) NOT NULL,
-    `category_id` bigint(20) NOT NULL,
-    `cost` float NOT NULL,
-    `discount_cost` float NOT NULL,
+    `name` char(128) NOT NULL DEFAULT "",
+    `category_id` bigint(20) NOT NULL DEFAULT 0,
+    `cost` float NOT NULL DEFAULT 0,
+    `desc` char(128) NOT NULL DEFAULT "",
+    `image` char(128) NOT NULL DEFAULT "",
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
-CREATE TABLE `images` (
+CREATE TABLE `orders` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `product_id` bigint(20) NOT NULL,
-    `path` char(128) NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY (`path`)
+    `user_id` bigint(20) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+CREATE TABLE `order_products` (
+    `order_id` bigint(20) NOT NULL DEFAULT 0,
+    `product_id` bigint(20) NOT NULL DEFAULT 0,
+    `quantity` int NOT NULL DEFAULT 0,
+    PRIMARY KEY (`order_id`, `product_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+-- mb name should be primary key?
+CREATE TABLE `categories` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `name` char(128) NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 INSERT INTO
@@ -41,16 +55,20 @@ VALUES
 INSERT INTO
     `products` (
         `name`,
-        `desc`,
         `category_id`,
         `cost`,
-        `discount_cost`
+        `image`
     )
 VALUES
-    ("Продукт 1", "Описание продукта 1", 1, 1000, 500);
+    ("Худи", 1, 1999, "/static/img/hoodie.jpg");
 
 INSERT INTO
-    `images` (`product_id`, `path`)
+    `order_products` (
+        `order_id`,
+        `product_id`,
+        `quantity`
+    )
 VALUES
-    (1, "/static/img/test.jpg"),
-    (1, "/static/img/test1.jpg");
+    (1, 1, 1);
+
+insert into orders (user_id) values (1);

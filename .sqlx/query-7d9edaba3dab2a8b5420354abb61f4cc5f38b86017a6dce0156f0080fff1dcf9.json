@@ -1,0 +1,80 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT * FROM products",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT",
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "category_id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "cost",
+        "type_info": {
+          "type": "Float",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 12
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "desc",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "image",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7d9edaba3dab2a8b5420354abb61f4cc5f38b86017a6dce0156f0080fff1dcf9"
+}

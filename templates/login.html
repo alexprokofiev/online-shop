@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="/static/css/login.css">
-<div class="d-flex justify-content-center mt-5">
-    <form class="border border-primary-subtle p-4 rounded" method="post" action= "/{% if signin %}login{% else %}signup{% endif %}">
+
+<div class="container d-flex justify-content-center mt-5">
+    <form class="border border-primary p-4 rounded" method="post" action= "/{% if signin %}login{% else %}signup{% endif %}">
         <div class="form-outline mb-4 input-group-lg">
             <input type="email" name="email" class="form-control" required />
             <label class="form-label" for="email">Email address</label>

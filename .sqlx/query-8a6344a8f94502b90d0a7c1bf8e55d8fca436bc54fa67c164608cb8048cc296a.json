@@ -1,0 +1,91 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n            op.order_id,\n            op.product_id,\n            op.quantity,\n            p.name,\n            p.cost,\n            p.desc,\n            p.image\n        FROM\n            order_products op\n        JOIN products p ON (p.id = op.product_id)\n        JOIN orders o ON (o.id = op.order_id)\n            WHERE o.user_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "order_id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | PRIMARY_KEY",
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "product_id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | PRIMARY_KEY",
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "quantity",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "cost",
+        "type_info": {
+          "type": "Float",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 12
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "desc",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "image",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL",
+          "char_set": 224,
+          "max_size": 512
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8a6344a8f94502b90d0a7c1bf8e55d8fca436bc54fa67c164608cb8048cc296a"
+}

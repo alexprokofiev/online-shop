@@ -4,11 +4,13 @@
     <input type="text" class="search-input" placeholder="Искать здесь...           🔍︎">
 </div> <br>
 
-<div class="product-item">
-    <img src="https://files.gifts.ru/reviewer/tb/92/14101.30_46_500.jpg">
-    <div class="product-list">
-        <h3>Худи</h3>
-        <span class="price">₽ 1999</span>
-        <a href="" class="button">В корзину</a>
+{% for product in products %}
+    <div class="product-item">
+        <img src="{{ product.image }}">
+        <div class="product-list">
+            <h3>{{ product.name }}</h3>
+            <span class="price">₽ {{ product.cost }}</span>
+            <a href="" class="button">В корзину</a>
+        </div>
     </div>
-</div>
+{% endfor %}

@@ -1,27 +1,31 @@
 <link rel="stylesheet" href="/static/css/cart.css">
 <div class="shopping-cart">
+  {% for product in products %}
+
   <h2>Ваша корзина</h2><button class="clear-cart-btn">Очистить корзину</button>
   <div class="item">
     <div class="image">
-      <img src="https://files.gifts.ru/reviewer/tb/92/14101.30_46_500.jpg" alt="Название товара 1"
+      <img src="{{ product.image }}" alt="Название товара 1"
         style="max-width: 220px;" />
     </div>
     <div class="details">
-      <h3>Название товара 1</h3>
-      <p>Описание товара 1</p>
+      <h3>{{ product.name }}</h3>
+      <p>{{ product.desc }}</p>
       <span>Размер:</span>
       <span>Выбрано: XXL</span> <!-- Предполагается, что размер уже выбран -->
-      <span>Цена: <span id="itemPrice">1 999</span></span>
+      <span>Цена: <span id="itemPrice">{{ product.cost }}</span></span>
       <span style="margin-top: 5px;">Количество:</span>
-      <input type="number" min="1" value="1" class="quantity-input" id="itemQuantity">
+      <input type="number" min="1" value="{{ product.quantity }}" class="quantity-input" id="itemQuantity">
     </div>
   </div>
+
+  {% endfor %}
 
   <!-- остальные товары -->
 
   <div class="total-cost">
     <span class="cost-label">Общая стоимость:</span>
-    <span class="cost-value" id="totalCostValue">0 ₽</span>
+    <span class="cost-value" id="totalCostValue">{{ total }} ₽</span>
   </div>
 
   <script src="static/js/cart.js"></script>

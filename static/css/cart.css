@@ -10,6 +10,10 @@
   border-radius: 10px;
 }
 
+h2, .cost-label, .cost-value {
+  color: #505050;
+}
+
 .item {
   display: flex;
   align-items: flex-start;

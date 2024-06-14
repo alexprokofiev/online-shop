@@ -10,7 +10,7 @@ use sha2::{Sha512, Digest};
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 mod model;
-pub use crate::model::User;
+pub use crate::model::{User, Product, CartProduct};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -57,9 +57,21 @@ async fn index() -> HttpResponse {
 }
 
 #[get("/catalog")]
-async fn catalog() -> HttpResponse {
+async fn catalog(data: web::Data<AppState>) -> HttpResponse {
+    let products: Vec<Product> = sqlx::query_as!(
+        Product,
+        r#"SELECT * FROM products"#
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap();
+
+    let mut ctx = Context::new();
+
+    ctx.insert("products", &products);
+
     HttpResponse::Ok().body(
-        TEMPLATES.render("catalog.html", &Context::new()).unwrap()
+        TEMPLATES.render("catalog.html", &ctx).unwrap()
     )
 }
 
@@ -118,9 +130,43 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
 }
 
 #[get("/cart")]
-async fn cart() -> HttpResponse {
+async fn cart(data: web::Data<AppState>) -> HttpResponse {
+    let products: Vec<CartProduct> = sqlx::query_as!(
+        CartProduct,
+        r#"SELECT
+            op.order_id,
+            op.product_id,
+            op.quantity,
+            p.name,
+            p.cost,
+            p.desc,
+            p.image
+        FROM
+            order_products op
+        JOIN products p ON (p.id = op.product_id)
+        JOIN orders o ON (o.id = op.order_id)
+            WHERE o.user_id = ?"#,
+        1
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap();
+
+    let mut ctx = Context::new();
+
+    ctx.insert("products", &Vec::<CartProduct>::new());
+    ctx.insert("total", &0);
+
+    if products.len() != 0 {
+        let total: f64 = products.iter().map(|a| a.cost * a.quantity as f64).reduce(|a, b| a+b).unwrap();
+
+        ctx.insert("products", &products);
+        ctx.insert("total", &total);
+
+    }
+
     HttpResponse::Ok().body(
-        TEMPLATES.render("cart.html", &Context::new()).unwrap()
+        TEMPLATES.render("cart.html", &ctx).unwrap()
     )
 }
 
