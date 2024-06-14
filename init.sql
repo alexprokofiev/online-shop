@@ -60,15 +60,5 @@ INSERT INTO
         `image`
     )
 VALUES
-    ("Худи", 1, 1999, "/static/img/hoodie.jpg");
-
-INSERT INTO
-    `order_products` (
-        `order_id`,
-        `product_id`,
-        `quantity`
-    )
-VALUES
-    (1, 1, 1);
-
-insert into orders (user_id) values (1);
+    ("Худи", 1, 1999, "/static/img/hoodie.jpg"),
+    ("Не худи", 1, 999, "/static/img/cl1_jacket.jpg");

@@ -72,6 +72,8 @@ function order() {
     });
 
     window.location.href = "/";
+
+    clearCart();
 }
 
 const clearCart = () => {
