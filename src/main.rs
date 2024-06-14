@@ -1,17 +1,16 @@
-use std::alloc::System;
-use actix_web::{get, post, web, cookie, HttpResponse, HttpRequest};
-use tera::{Tera, Context};
+use actix_web::{cookie, get, post, web, HttpRequest, HttpResponse};
 use lazy_static::lazy_static;
+use std::alloc::System;
+use tera::{Context, Tera};
 
-use serde::{Serialize, Deserialize};
 use jsonwebtoken;
-use sha2::{Sha512, Digest};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha512};
 
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 mod model;
-pub use crate::model::{User, Product, CartProduct, Order};
-
+pub use crate::model::{CartProduct, Order, Product, User};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
@@ -44,50 +43,37 @@ static A: System = System;
 
 #[get("/home")]
 async fn home() -> HttpResponse {
-    HttpResponse::Ok().body(
-        TEMPLATES.render("home.html", &Context::new()).unwrap()
-    )
+    HttpResponse::Ok().body(TEMPLATES.render("home.html", &Context::new()).unwrap())
 }
 
 #[get("/")]
 async fn index(req: HttpRequest) -> HttpResponse {
     let mut ctx = Context::new();
-    
+
     let c = req.cookie("email");
 
     return match c {
         Some(s) => {
             ctx.insert("email", &s.to_string().strip_prefix("email="));
 
-            HttpResponse::Ok().body(
-                TEMPLATES.render("index.html", &ctx).unwrap()
-            )
+            HttpResponse::Ok().body(TEMPLATES.render("index.html", &ctx).unwrap())
         }
-        None => {
-            HttpResponse::Ok().body(
-                TEMPLATES.render("index.html", &ctx).unwrap()
-            )
-        }
-    }
+        None => HttpResponse::Ok().body(TEMPLATES.render("index.html", &ctx).unwrap()),
+    };
 }
 
 #[get("/catalog")]
 async fn catalog(data: web::Data<AppState>) -> HttpResponse {
-    let products: Vec<Product> = sqlx::query_as!(
-        Product,
-        r#"SELECT * FROM products"#
-    )
-    .fetch_all(&data.db)
-    .await
-    .unwrap();
+    let products: Vec<Product> = sqlx::query_as!(Product, r#"SELECT * FROM products"#)
+        .fetch_all(&data.db)
+        .await
+        .unwrap();
 
     let mut ctx = Context::new();
 
     ctx.insert("products", &products);
 
-    HttpResponse::Ok().body(
-        TEMPLATES.render("catalog.html", &ctx).unwrap()
-    )
+    HttpResponse::Ok().body(TEMPLATES.render("catalog.html", &ctx).unwrap())
 }
 
 #[get("/login")]
@@ -96,9 +82,7 @@ async fn get_login() -> HttpResponse {
 
     ctx.insert("signin", &true);
 
-    HttpResponse::Ok().body(
-        TEMPLATES.render("login.html", &ctx).unwrap()
-    )
+    HttpResponse::Ok().body(TEMPLATES.render("login.html", &ctx).unwrap())
 }
 
 #[get("/signup")]
@@ -107,9 +91,7 @@ async fn signup() -> HttpResponse {
 
     ctx.insert("signin", &false);
 
-    HttpResponse::Ok().body(
-        TEMPLATES.render("login.html", &ctx).unwrap()
-    )
+    HttpResponse::Ok().body(TEMPLATES.render("login.html", &ctx).unwrap())
 }
 
 #[derive(Deserialize)]
@@ -138,7 +120,7 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
         return HttpResponse::BadRequest().body("Login failed");
     }
 
-    let claims = &Claims{
+    let claims = &Claims {
         user_id: users[0].id,
     };
 
@@ -146,7 +128,8 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
         &jsonwebtoken::Header::default(),
         &claims,
         &jsonwebtoken::EncodingKey::from_secret(SECRET_KEY.as_bytes()),
-    ).unwrap();
+    )
+    .unwrap();
 
     let mut ctx = Context::new();
 
@@ -155,9 +138,7 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
     HttpResponse::Ok()
         .cookie(cookie::Cookie::build("token", token).finish())
         .cookie(cookie::Cookie::build("email", &users[0].email).finish())
-        .body(
-            TEMPLATES.render("index.html", &ctx).unwrap()
-        )
+        .body(TEMPLATES.render("index.html", &ctx).unwrap())
 }
 
 #[derive(Deserialize)]
@@ -166,58 +147,85 @@ struct AddToCartForm {
 }
 
 #[post("clear_cart")]
-async fn clear_cart(_req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    let _ = sqlx::query(
-        "DELETE FROM order_products")
-        .execute(&data.db).await;
+async fn clear_cart(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+    let _ = sqlx::query!(
+        "DELETE FROM order_products where order_id = (select id from orders where user_id = ?)",
+        auth(req),
+    )
+        .execute(&data.db)
+        .await;
 
-        HttpResponse::Ok().body("")
+    HttpResponse::Ok().body("")
+}
+
+fn auth(req: HttpRequest) -> i64 {
+    return match req.cookie("token") {
+        Some(s) => {
+            let q = s.to_string().clone();
+
+            let token = q.strip_prefix("token=").unwrap_or("");
+
+            if token.len() == 0 {
+                return 0;
+            }
+
+            match jsonwebtoken::decode::<Claims>(
+                token,
+                &jsonwebtoken::DecodingKey::from_secret(SECRET_KEY.as_bytes()),
+                &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::HS256),
+            ) {
+                Ok(token_data) => token_data.claims.user_id,
+                Err(_) => return 0,
+            }
+        },
+        None => 0,
+    }
 }
 
 #[post("/add_to_cart")]
-async fn add_to_cart(_req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    let user_id = 1;
+async fn add_to_cart(
+    req: HttpRequest,
+    data: web::Data<AppState>, 
+    form: web::Form<AddToCartForm>,
+) -> HttpResponse {
+    let user_id = auth(req);
 
-    // let mut order: Vec<Order> = sqlx::query_as!(
-    //     Order,
-    //     r#"SELECT
-    //         *
-    //     FROM
-    //         orders
-    //     WHERE user_id = ?"#,
-    //     1
-    // )
-    // .fetch_all(&data.db)
-    // .await
-    // .unwrap();
+    let mut order: Vec<Order> = sqlx::query_as!(
+        Order,
+        r#"SELECT
+            *
+        FROM
+            orders
+        WHERE user_id = ?"#,
+        user_id
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap();
 
-    // if order.len() == 0 {
-    //     let _ = sqlx::query(
-    //         "INSERT INTO
-    //             `orders` (
-    //                 `user_id`,
-    //             )
-    //         VALUES
-    //             ($1);"
-    //     )
-    //         .bind(user_id)
-    //         .execute(&data.db).await;
+    if order.len() == 0 {
+        let _ = sqlx::query!(
+            "INSERT INTO orders (user_id) VALUES (?);",
+            user_id,
+        )
+        .execute(&data.db)
+        .await;
 
-    //         order = sqlx::query_as!(
-    //             Order,
-    //             r#"SELECT
-    //                 *
-    //             FROM
-    //                 orders
-    //             WHERE user_id = ?"#,
-    //             1
-    //         )
-    //         .fetch_all(&data.db)
-    //         .await
-    //         .unwrap();
-    // }
+        order = sqlx::query_as!(
+            Order,
+            r#"SELECT
+                    *
+                FROM
+                    orders
+                WHERE user_id = ?"#,
+            user_id
+        )
+        .fetch_all(&data.db)
+        .await
+        .unwrap();
+    }
 
-    let _ = sqlx::query(
+    let _ = sqlx::query!(
         "INSERT INTO
             `order_products` (
                 `order_id`,
@@ -225,18 +233,21 @@ async fn add_to_cart(_req: HttpRequest, data: web::Data<AppState>) -> HttpRespon
                 `quantity`
             )
         VALUES
-            (?, ?, ?);"
+            (?, ?, ?);",
+        order[0].id,
+        form.product_id,
+        1,
     )
-        .bind(1)
-        .bind(1)
-        .bind(1)
-        .execute(&data.db).await;
+    .execute(&data.db)
+    .await;
 
-        HttpResponse::Ok().body("")
+    HttpResponse::Ok().body("")
 }
 
 #[get("/cart")]
-async fn cart(data: web::Data<AppState>) -> HttpResponse {
+async fn cart(req : HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+    let user_id = auth(req);
+
     let products: Vec<CartProduct> = sqlx::query_as!(
         CartProduct,
         r#"SELECT
@@ -252,7 +263,7 @@ async fn cart(data: web::Data<AppState>) -> HttpResponse {
         JOIN products p ON (p.id = op.product_id)
         JOIN orders o ON (o.id = op.order_id)
             WHERE o.user_id = ?"#,
-        1
+        user_id
     )
     .fetch_all(&data.db)
     .await
@@ -264,16 +275,17 @@ async fn cart(data: web::Data<AppState>) -> HttpResponse {
     ctx.insert("total", &0);
 
     if products.len() != 0 {
-        let total: f64 = products.iter().map(|a| a.cost * a.quantity as f64).reduce(|a, b| a+b).unwrap();
+        let total: f64 = products
+            .iter()
+            .map(|a| a.cost * a.quantity as f64)
+            .reduce(|a, b| a + b)
+            .unwrap();
 
         ctx.insert("products", &products);
         ctx.insert("total", &total);
-
     }
 
-    HttpResponse::Ok().body(
-        TEMPLATES.render("cart.html", &ctx).unwrap()
-    )
+    HttpResponse::Ok().body(TEMPLATES.render("cart.html", &ctx).unwrap())
 }
 
 #[actix_web::main]
@@ -309,8 +321,9 @@ async fn main() -> std::io::Result<()> {
             .service(add_to_cart)
             .service(clear_cart)
             .service(signup)
-    }).workers(available_parallelism().unwrap().get())
-        .bind(("0.0.0.0", 8080))?
-        .run()
-        .await
+    })
+    .workers(available_parallelism().unwrap().get())
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await
 }

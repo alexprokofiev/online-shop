@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO\n            `order_products` (\n                `order_id`,\n                `product_id`,\n                `quantity`\n            )\n        VALUES\n            (?, ?, ?);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "dec394983a5bf35768aa1fca50c44606e74858dec60c513ea5256b33033e3acc"
+}

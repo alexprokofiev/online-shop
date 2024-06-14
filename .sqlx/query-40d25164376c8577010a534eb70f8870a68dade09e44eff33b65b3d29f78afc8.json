@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO orders (user_id) VALUES (?);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "40d25164376c8577010a534eb70f8870a68dade09e44eff33b65b3d29f78afc8"
+}

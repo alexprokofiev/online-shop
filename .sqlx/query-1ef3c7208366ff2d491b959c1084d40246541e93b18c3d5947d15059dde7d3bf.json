@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "DELETE FROM order_products where order_id = (select id from orders where user_id = ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "1ef3c7208366ff2d491b959c1084d40246541e93b18c3d5947d15059dde7d3bf"
+}

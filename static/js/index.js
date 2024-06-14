@@ -33,13 +33,11 @@ window.addEventListener("load", init);
 
 
 function addToCart(productId) {
-    const data = new FormData();
+    const data = new URLSearchParams();
+
     data.append("product_id", productId);
     fetch('/add_to_cart', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        },
         body: data,
     });
 
@@ -58,13 +56,19 @@ function q() {
 }
 
 function order() {
-    fetch('/clear_cart', {
+    fetch('/order', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        },
         body: "",
     });
 
     window.location.href = "/";
 }
+
+const clearCart = () => {
+    fetch('/clear_cart', {
+        method: 'POST',
+        body: "",
+    });
+
+    window.location.href = "/";
+};
