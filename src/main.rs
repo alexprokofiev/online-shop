@@ -157,8 +157,6 @@ async fn post_signup(data: web::Data<AppState>, form: web::Form<LoginForm>) -> H
     .execute(&data.db)
     .await;
 
-    println!("{:?}", res);
-
     let mut ctx = Context::new();
 
     ctx.insert("email", &form.email.clone());
