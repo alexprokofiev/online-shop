@@ -7,7 +7,7 @@ USE `shop`;
 CREATE TABLE `users` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `email` char(128) NOT NULL,
-    `phone_number` char(128) NOT NULL,
+    `phone_number` char(128) NOT NULL DEFAULT "",
     `password` char(128) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY (`email`)

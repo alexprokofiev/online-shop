@@ -28,7 +28,7 @@
         "name": "phone_number",
         "type_info": {
           "type": "String",
-          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "flags": "NOT_NULL",
           "char_set": 224,
           "max_size": 512
         }

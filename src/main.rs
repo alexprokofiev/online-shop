@@ -143,6 +143,31 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
         .body(TEMPLATES.render("index.html", &ctx).unwrap())
 }
 
+#[post("/signup")]
+async fn post_signup(data: web::Data<AppState>, form: web::Form<LoginForm>) -> HttpResponse {
+    let mut hasher = Sha512::new();
+    hasher.update(PASSWORD_HASH_SALT);
+    hasher.update(form.password.clone());
+
+    let res = sqlx::query!(
+        "INSERT INTO users (email, password) VALUES (?, ?)",
+        form.email,
+        format!("{:x}", hasher.finalize())
+    )
+    .execute(&data.db)
+    .await;
+
+    println!("{:?}", res);
+
+    let mut ctx = Context::new();
+
+    ctx.insert("email", &form.email.clone());
+
+    HttpResponse::Ok()
+        .cookie(cookie::Cookie::build("email", &form.email).finish())
+        .body(TEMPLATES.render("index.html", &ctx).unwrap())
+}
+
 #[derive(Deserialize)]
 struct AddToCartForm {
     product_id: i64,
@@ -355,6 +380,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_to_cart)
             .service(clear_cart)
             .service(signup)
+            .service(post_signup)
             .service(change_quantity)
     })
     .workers(available_parallelism().unwrap().get())
