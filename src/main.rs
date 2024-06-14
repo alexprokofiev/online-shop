@@ -1,5 +1,5 @@
 use std::alloc::System;
-use actix_web::{get, post, web, cookie, HttpResponse};
+use actix_web::{get, post, web, cookie, HttpResponse, HttpRequest};
 use tera::{Tera, Context};
 use lazy_static::lazy_static;
 
@@ -10,7 +10,7 @@ use sha2::{Sha512, Digest};
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 mod model;
-pub use crate::model::{User, Product, CartProduct};
+pub use crate::model::{User, Product, CartProduct, Order};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,10 +50,25 @@ async fn home() -> HttpResponse {
 }
 
 #[get("/")]
-async fn index() -> HttpResponse {
-    HttpResponse::Ok().body(
-        TEMPLATES.render("index.html", &Context::new()).unwrap()
-    )
+async fn index(req: HttpRequest) -> HttpResponse {
+    let mut ctx = Context::new();
+    
+    let c = req.cookie("email");
+
+    return match c {
+        Some(s) => {
+            ctx.insert("email", &s.to_string().strip_prefix("email="));
+
+            HttpResponse::Ok().body(
+                TEMPLATES.render("index.html", &ctx).unwrap()
+            )
+        }
+        None => {
+            HttpResponse::Ok().body(
+                TEMPLATES.render("index.html", &ctx).unwrap()
+            )
+        }
+    }
 }
 
 #[get("/catalog")]
@@ -80,6 +95,17 @@ async fn get_login() -> HttpResponse {
     let mut ctx = Context::new();
 
     ctx.insert("signin", &true);
+
+    HttpResponse::Ok().body(
+        TEMPLATES.render("login.html", &ctx).unwrap()
+    )
+}
+
+#[get("/signup")]
+async fn signup() -> HttpResponse {
+    let mut ctx = Context::new();
+
+    ctx.insert("signin", &false);
 
     HttpResponse::Ok().body(
         TEMPLATES.render("login.html", &ctx).unwrap()
@@ -122,11 +148,91 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
         &jsonwebtoken::EncodingKey::from_secret(SECRET_KEY.as_bytes()),
     ).unwrap();
 
+    let mut ctx = Context::new();
+
+    ctx.insert("email", &users[0].email.clone());
+
     HttpResponse::Ok()
         .cookie(cookie::Cookie::build("token", token).finish())
+        .cookie(cookie::Cookie::build("email", &users[0].email).finish())
         .body(
-            TEMPLATES.render("index.html", &Context::new()).unwrap()
+            TEMPLATES.render("index.html", &ctx).unwrap()
         )
+}
+
+#[derive(Deserialize)]
+struct AddToCartForm {
+    product_id: i64,
+}
+
+#[post("clear_cart")]
+async fn clear_cart(_req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+    let _ = sqlx::query(
+        "DELETE FROM order_products")
+        .execute(&data.db).await;
+
+        HttpResponse::Ok().body("")
+}
+
+#[post("/add_to_cart")]
+async fn add_to_cart(_req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+    let user_id = 1;
+
+    // let mut order: Vec<Order> = sqlx::query_as!(
+    //     Order,
+    //     r#"SELECT
+    //         *
+    //     FROM
+    //         orders
+    //     WHERE user_id = ?"#,
+    //     1
+    // )
+    // .fetch_all(&data.db)
+    // .await
+    // .unwrap();
+
+    // if order.len() == 0 {
+    //     let _ = sqlx::query(
+    //         "INSERT INTO
+    //             `orders` (
+    //                 `user_id`,
+    //             )
+    //         VALUES
+    //             ($1);"
+    //     )
+    //         .bind(user_id)
+    //         .execute(&data.db).await;
+
+    //         order = sqlx::query_as!(
+    //             Order,
+    //             r#"SELECT
+    //                 *
+    //             FROM
+    //                 orders
+    //             WHERE user_id = ?"#,
+    //             1
+    //         )
+    //         .fetch_all(&data.db)
+    //         .await
+    //         .unwrap();
+    // }
+
+    let _ = sqlx::query(
+        "INSERT INTO
+            `order_products` (
+                `order_id`,
+                `product_id`,
+                `quantity`
+            )
+        VALUES
+            (?, ?, ?);"
+    )
+        .bind(1)
+        .bind(1)
+        .bind(1)
+        .execute(&data.db).await;
+
+        HttpResponse::Ok().body("")
 }
 
 #[get("/cart")]
@@ -200,6 +306,9 @@ async fn main() -> std::io::Result<()> {
             .service(get_login)
             .service(post_login)
             .service(cart)
+            .service(add_to_cart)
+            .service(clear_cart)
+            .service(signup)
     }).workers(available_parallelism().unwrap().get())
         .bind(("0.0.0.0", 8080))?
         .run()

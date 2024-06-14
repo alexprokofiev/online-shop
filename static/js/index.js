@@ -30,3 +30,41 @@ const init = () => {
 };
 
 window.addEventListener("load", init);
+
+
+function addToCart(productId) {
+    const data = new FormData();
+    data.append("product_id", productId);
+    fetch('/add_to_cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        body: data,
+    });
+
+    return false;
+};
+
+function q() {
+    let res = 0;
+    document.getElementsByName("itemPrice").forEach(
+        el => {
+            res += +el.innerText * +document.getElementsByName("quantity")[0].value;
+        }
+    )
+
+    document.getElementById("totalCostValue").innerText = res + " ₽";
+}
+
+function order() {
+    fetch('/clear_cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        body: "",
+    });
+
+    window.location.href = "/";
+}

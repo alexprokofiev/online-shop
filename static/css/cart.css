@@ -165,10 +165,27 @@ h2, .cost-label, .cost-value {
   transition: background-color 0.3s ease;
   border: 1px solid rgb(95, 95, 95);
 }
-
 .clear-cart-btn:hover {
   background-color: #d32f2f;
 }
+.pay-cart-btn {
+  order: 1;
+  margin-top: 10px;
+  background-color: #1a3227;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid rgb(95, 95, 95);
+}
+.pay-cart-btn:hover {
+  background-color: #0e650b;
+}
+
 h3 {
   color: #000;
 }

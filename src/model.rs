@@ -40,3 +40,8 @@ pub struct CartProduct {
     pub order_id: i64,
     pub quantity: i32,
 }
+
+pub struct Order {
+    pub id: i64,
+    pub user_id: i64,
+}
