@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "UPDATE order_products SET quantity = ? WHERE order_id = (select id from orders where user_id = ?) AND product_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "0e4da89b2aff47a6b8bf7d5db174f281eb00e7017c908de28abecd2c05f9da68"
+}

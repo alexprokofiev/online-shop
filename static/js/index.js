@@ -48,9 +48,19 @@ function q() {
     let res = 0;
     document.getElementsByName("itemPrice").forEach(
         el => {
-            res += +el.innerText * +document.getElementsByName("quantity")[0].value;
+            res += +el.innerText * +el.parentElement.nextSibling.nextSibling.nextSibling.nextSibling.value;
+
+            const data = new URLSearchParams();
+
+            data.append("product_id", +el.parentElement.nextSibling.nextSibling.nextSibling.nextSibling.dataset.productId);
+            data.append("quantity", el.parentElement.nextSibling.nextSibling.nextSibling.nextSibling.value);
+
+            fetch('/change_quantity', {
+                method: 'POST',
+                body: data,
+            });
         }
-    )
+    );
 
     document.getElementById("totalCostValue").innerText = res + " ₽";
 }

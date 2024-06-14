@@ -14,7 +14,7 @@
       <span>Выбрано: XXL</span> <!-- Предполагается, что размер уже выбран -->
       <span>Цена: <span name="itemPrice">{{ product.cost }}</span></span>
       <span style="margin-top: 5px;">Количество:</span>
-      <input type="number" min="1" name="quantity" value="{{ product.quantity }}" class="quantity-input" onchange="q()" id="itemQuantity">
+      <input type="number" min="1" name="quantity" value="{{ product.quantity }}" class="quantity-input" data-product-id="{{ product.product_id }}" onchange="q()" id="itemQuantity">
     </div>
   </div>
 

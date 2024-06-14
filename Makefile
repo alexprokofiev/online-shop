@@ -15,3 +15,6 @@ build_dev:
 
 dev:
 	IMG=app-dev docker-compose -f docker-compose-dev.yml up -d
+
+sqlx:
+	DATABASE_URL=mysql://root:root@127.0.0.1:3306/shop cargo sqlx prepare

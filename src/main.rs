@@ -15,6 +15,7 @@ pub use crate::model::{CartProduct, Order, Product, User};
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
     user_id: i64,
+    exp: i64,
 }
 
 pub struct AppState {
@@ -122,6 +123,7 @@ async fn post_login(data: web::Data<AppState>, form: web::Form<LoginForm>) -> Ht
 
     let claims = &Claims {
         user_id: users[0].id,
+        exp: i64::MAX,
     };
 
     let token: String = jsonwebtoken::encode(
@@ -172,14 +174,46 @@ fn auth(req: HttpRequest) -> i64 {
             match jsonwebtoken::decode::<Claims>(
                 token,
                 &jsonwebtoken::DecodingKey::from_secret(SECRET_KEY.as_bytes()),
-                &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::HS256),
+                &jsonwebtoken::Validation::default(),
             ) {
-                Ok(token_data) => token_data.claims.user_id,
-                Err(_) => return 0,
+                Ok(token_data) => {
+                    token_data.claims.user_id
+                },
+                Err(e) => {
+                    println!("{:?}", e);
+
+                    0
+                }
             }
         },
         None => 0,
     }
+}
+
+#[derive(Deserialize)]
+struct ChangeQuantityForm {
+    product_id: i64,
+    quantity: i64,
+}
+
+#[post("/change_quantity")]
+async fn change_quantity(
+    req: HttpRequest,
+    data: web::Data<AppState>,
+    form: web::Form<ChangeQuantityForm>,
+) -> HttpResponse {
+    let user_id = auth(req);
+
+    let _ = sqlx::query!(
+        "UPDATE order_products SET quantity = ? WHERE order_id = (select id from orders where user_id = ?) AND product_id = ?",
+        form.quantity,
+        user_id,
+        form.product_id
+    )
+    .execute(&data.db)
+    .await;
+
+    HttpResponse::Ok().body("")
 }
 
 #[post("/add_to_cart")]
@@ -321,6 +355,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_to_cart)
             .service(clear_cart)
             .service(signup)
+            .service(change_quantity)
     })
     .workers(available_parallelism().unwrap().get())
     .bind(("0.0.0.0", 8080))?
